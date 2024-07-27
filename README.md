@@ -9,3 +9,11 @@ CO is an innovative programming language designed to unify various programming l
 ## How Will CO Achieve This?
 
 You might be wondering how CO will integrate multiple programming languages. Our approach involves using a powerful interpreter that dynamically handles different programming languages based on your requirements. When you need a compiler for specific tasks, you can easily switch configurations using `coe init` to adjust the `settings.co.json` file. This flexibility ensures that CO can adapt to various programming paradigms, making it a robust tool for diverse projects.
+
+## How Are We Going to Make This Performant?
+
+To ensure CO delivers high performance, we are adopting a modular approach. The language will support a "plugins" folder where you can add and manage different components. Simply place the relevant files into this folder, and you're set! This modular system allows you to include only the features and functionalities you need, minimizing overhead and optimizing performance.
+
+## Why Use Node.js as a Backend?
+
+We chose Node.js for our backend due to its seamless integration with the C programming language. Since Node.js itself is built on C, leveraging it allows us to take advantage of its performance and simplicity. This choice streamlines our development process, enabling more efficient interaction between CO and Node.js, and ultimately enhancing the overall system's effectiveness.
