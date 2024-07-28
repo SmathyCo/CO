@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "cJSON.h"
 
 #define MAX_BUFFER_SIZE 1024
@@ -9,6 +10,7 @@ typedef struct {
     char *type;
     char *name;
     char *value;
+    char *valueType;
 } TypeInfo;
 
 TypeInfo *process_json(const char *json_str, int *num_entries) {
@@ -43,6 +45,7 @@ TypeInfo *process_json(const char *json_str, int *num_entries) {
             info[index].type = strdup(type); // Allocate memory for Type
             info[index].name = NULL;
             info[index].value = NULL;
+            info[index].valueType = NULL;
 
             if (strcmp(type, "functionExecution") == 0) {
                 cJSON *name_value = cJSON_GetObjectItemCaseSensitive(item, "Name");
@@ -56,6 +59,12 @@ TypeInfo *process_json(const char *json_str, int *num_entries) {
                     const char *value = cJSON_GetStringValue(value_value);
                     info[index].value = strdup(value); // Allocate memory for Value
                 }
+
+                cJSON *valueType_value = cJSON_GetObjectItemCaseSensitive(item, "ValueType");
+                if (valueType_value != NULL && cJSON_IsString(valueType_value)) {
+                    const char *valueType = cJSON_GetStringValue(valueType_value);
+                    info[index].valueType = strdup(valueType); // Allocate memory for ValueType
+                }
             }
             index++;
         }
@@ -64,6 +73,30 @@ TypeInfo *process_json(const char *json_str, int *num_entries) {
     cJSON_Delete(json);
     *num_entries = index; // Update number of entries found
     return info;
+}
+
+char *slice(const char *str) {
+    int len = strlen(str);
+    
+    // Allocate memory for the substring
+    char *substring = (char *)malloc(len); // Allocate enough space including null terminator
+    
+    if (substring == NULL) {
+        printf("Memory allocation failed.\n");
+        return NULL;
+    }
+    
+    // Copy characters from index 1 to second-to-last character
+    strncpy(substring, str + 1, len - 2); // -1 for index adjustment, -1 for null terminator
+    
+    // Null-terminate the substring
+    substring[len - 2] = '\0'; // Set null terminator
+    
+    return substring;
+}
+
+bool parseToBool(const char* str) {
+    return str != NULL && strcmp(str, "true") == 0;
 }
 
 int main(int argc, char *argv[]) {
@@ -90,14 +123,22 @@ int main(int argc, char *argv[]) {
             // Print Type, Name, and Value for functionExecution
             for (int i = 0; i < num_entries; i++) {
                 if (strcmp(info[i].type, "functionExecution") == 0) {
-                    printf("Type: %s, Name: %s\n", info[i].type, info[i].name != NULL ? info[i].name : "N/A");
                     if (strcmp(info[i].name, "print") == 0) {
-                        printf(info[i].value != NULL ? info[i].value : "N/A");
+                        if (strcmp(info[i].valueType, "string") == 0) {
+                            printf(info[i].value != NULL ? slice(info[i].value) : "N/A");
+                        } else if (strcmp(info[i].valueType, "boolean") == 0) {
+                            printf("%s", parseToBool(info[i].value) ? "true" : "false");
+                        } else if (strcmp(info[i].valueType, "integer") == 0) {
+                            printf("%d", atoi(info[i].value));
+                        } else if (strcmp(info[i].valueType, "variable") == 0) {
+                            // Print a variable value
+                        }
                     }
                 }
                 free(info[i].type); // Free allocated memory for Type
                 free(info[i].name); // Free allocated memory for Name
                 free(info[i].value); // Free allocated memory for Value
+                free(info[i].valueType); // Free allocated memory for ValueType
             }
             free(info); // Free memory for array of TypeInfo structures
         }
