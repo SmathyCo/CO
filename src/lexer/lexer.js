@@ -172,7 +172,7 @@
 
     // Execute a shell command to run your C program with the data file as input
     const { exec } = require('child_process');
-    exec('gcc -o ./src/interpreter/interpreter ./src/interpreter/interpreter.c && .\\src\\interpreter\\interpreter ./src/lexer/tokens.json', (err, stdout, stderr) => {
+    exec('gcc -o ./src/interpreter/interpreter ./src/interpreter/interpreter.c ./src/interpreter/cJSON.c && .\\src\\interpreter\\interpreter ./src/lexer/tokens.json', (err, stdout, stderr) => {
         if (err) {
             console.error('Error executing C program:', err);
             return;
