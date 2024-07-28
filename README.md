@@ -17,3 +17,12 @@ To ensure CO delivers high performance, we are adopting a modular approach. The 
 ## Why Use Node.js as a Backend?
 
 We chose Node.js for our backend due to its seamless integration with the C programming language. Since Node.js itself is built on C, leveraging it allows us to take advantage of its performance and simplicity. This choice streamlines our development process, enabling more efficient interaction between CO and Node.js, and ultimately enhancing the overall system's effectiveness.
+
+# How to install everything?
+
+1. Open a command prompt as administrator.
+2. Navigate inside the ./src/ folder of the project.
+3. Run the ./index.bat file that is inside the ./src/ folder.
+4. It should open a command prompt window and you just need to wait for it to install the dependencies.
+5. Close the command prompts you are using and reopen the ones that you will use for the project.
+6. Now you can use `co ./index.co` to run a co file!
