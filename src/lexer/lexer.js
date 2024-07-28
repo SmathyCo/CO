@@ -1,6 +1,8 @@
 // Immediately execute a function to process the data when the module is loaded
 (function() {
 
+    const fs = require("fs");
+
     // Access data from global context or modify this to receive data differently
     const data = global.__lexerData; // Using a global variable for simplicity
     
@@ -17,7 +19,10 @@
             let tokens = [];
             for (let i = 0; i < dataNextLine.length; i++) {
                 for (let i2 = 0; i2 < dataNextLine[i].length; i2++) {
-    
+
+                    /*
+                        FUNCTION CREATION
+                    */
                     if (dataNextLine[i][i2].startsWith("function")) {
                         let cFunctionFirstSpace = dataNextLine[i][i2].indexOf(" ");
                         let cFunctionFirstOpenParen = dataNextLine[i][i2].indexOf("(");
@@ -59,7 +64,10 @@
                         }
 
                     }
-    
+
+                    /*
+                        FUNCTION EXECUTION
+                    */
                     let startParen = dataNextLine[i][i2].indexOf("("); // Getting where is the starting paren
                     let endParen = dataNextLine[i][i2].indexOf(")"); // Getting where is the ending paren
                     let secondBrace = dataNextLine[i][i2].indexOf("}");
@@ -108,7 +116,7 @@
                                             process.exit(1);
                                         }
                                         tokens.push({
-                                            'Type': "FunctionExecution",
+                                            'Type': "functionExecution",
                                             'Name': functionName,
                                             'Value': functionValue,
                                             'ValueType': functionType
@@ -149,12 +157,27 @@
                             }
                         }
                     }
-                    
+
                 }
                 return tokens;
         } else {
             console.log("No data provided to lexer.");
         }
     }
-    console.log(lexer(data));
+
+    global.__tokens = lexer(data);
+
+    // Write the data to a file (for demonstration purposes)
+    fs.writeFileSync('./src/lexer/tokens.json', JSON.stringify(__tokens));
+
+    // Execute a shell command to run your C program with the data file as input
+    const { exec } = require('child_process');
+    exec('gcc -o ./src/interpreter/interpreter ./src/interpreter/interpreter.c && .\\src\\interpreter\\interpreter ./src/lexer/tokens.json', (err, stdout, stderr) => {
+        if (err) {
+            console.error('Error executing C program:', err);
+            return;
+        }
+
+        console.log(stdout);
+    });
 })();
