@@ -1,10 +1,29 @@
 const fs = require("fs");
 const { spawnSync } = require("child_process");
 
+function promptSync(question) {
+    // Output the question to the user
+    process.stdout.write(question);
+
+    // Create a buffer to store input
+    const buffer = Buffer.alloc(1024);
+    
+    // Use process.stdin to read input synchronously
+    const bytesRead = fs.readSync(0, buffer, 0, buffer.length);
+
+    // Convert buffer to string and trim any extra whitespace
+    return buffer.toString('utf8', 0, bytesRead).trim();
+}
+
 if (process.argv[2] === "init") {
+    if (fs.existsSync("./settings.co.json")) {
+        console.log("Settings file already exists.");
+        process.exit(0);
+    }
     fs.writeFileSync("./settings.co.json", `{
-    "src": "./index.co"
+    "src": "${promptSync("What is the path of your project's main file? ")}"
 }`);
+    console.log("Settings file created successfully.");
 } else if (process.argv[2] === "run") {
     if (!fs.existsSync("./settings.co.json")) {
         console.log(`

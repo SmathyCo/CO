@@ -1,4 +1,5 @@
 function test(arg1, arg2) {
     print("Hello, world!");
+    print2("test");
 }
 print(test);
