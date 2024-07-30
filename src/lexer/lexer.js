@@ -66,6 +66,222 @@
                     }
 
                     /*
+                        VARIABLE ASSIGNMENT
+                    */
+                    let varPrefix = dataNextLine[i][i2].indexOf("var");
+                    if (dataNextLine[i][i2].charAt(varPrefix) === "v" && dataNextLine[i][i2].charAt(varPrefix + 1) === "a" && dataNextLine[i][i2].charAt(varPrefix + 2) === "r") {
+                        if (dataNextLine[i][i2].charAt(varPrefix + 3) === " ") {
+                            let varValues = /var\s([a-zA-Z])\s*=\s*([a-zA-Z0-9]+|"([^"]*)")/.exec(dataNextLine[i][i2]);
+                            let varName = varValues[1].trim();
+                            let varValue = varValues[2];
+                            let varValueType;
+                            if (varValue.startsWith("'") && varValue.endsWith("'") || varValue.startsWith('"') && varValue.endsWith('"')) {
+                                varValueType = "string";
+                            } else if (/[0-9]/.test(varValue)) {
+                                varValueType = "integer";
+                            } else if (/true|false/.test(varValue)) {
+                                varValueType = "boolean";
+                            } else if (/[A-Za-z]/.test(varValue)) {
+                                varValueType = "variable";
+                            }
+                            if (varValueType === undefined) {
+                                console.log(`
+${'\x1b[31m'}Error: Variable Type Undefined${'\x1b[0m'}
+
+${'\x1b[33m'}Details:${'\x1b[0m'}
+Unable to find what type of value is inside the variable.
+
+${'\x1b[36m'}Example Fix:${'\x1b[0m'}
+${'\x1b[32m'}  // Before${'\x1b[0m'}
+${'\x1b[32m'}  var ${varName} = ${varValue}; // This could be undefined${'\x1b[0m'}
+
+${'\x1b[32m'}  // After${'\x1b[0m'}
+${'\x1b[32m'}  var ${varName} = 1; // Assign it with a good type of value${'\x1b[0m'}
+                                `);
+                                process.exit(1);
+                            }
+                            tokens.push({
+                                'Type': "variableDeclaration",
+                                'DeclType': "var",
+                                'Name': varName,
+                                'Value': varValue,
+                                'ValueType': varValueType
+                            });
+                        }
+                    }
+                    // int
+                    let intPrefix = dataNextLine[i][i2].indexOf("int");
+                    if (dataNextLine[i][i2].charAt(intPrefix) === "i" && dataNextLine[i][i2].charAt(intPrefix + 1) === "n" && dataNextLine[i][i2].charAt(intPrefix + 2) === "t") {
+                        if (dataNextLine[i][i2].charAt(intPrefix + 3) === " ") {
+                            let varValues = /int\s([a-zA-Z])\s*=\s*([a-zA-Z0-9]+|"([^"]*)")/.exec(dataNextLine[i][i2]);
+                            let varName = varValues[1].trim();
+                            let varValue = varValues[2];
+                            let varValueType;
+                            if (varValue.startsWith("'") && varValue.endsWith("'") || varValue.startsWith('"') && varValue.endsWith('"')) {
+                                varValueType = "string";
+                            } else if (/[0-9]/.test(varValue)) {
+                                varValueType = "integer";
+                            } else if (/true|false/.test(varValue)) {
+                                varValueType = "boolean";
+                            } else if (/[A-Za-z]/.test(varValue)) {
+                                varValueType = "variable";
+                            }
+                            if (varValueType === undefined) {
+                                console.log(`
+${'\x1b[31m'}Error: Variable Type Undefined${'\x1b[0m'}
+
+${'\x1b[33m'}Details:${'\x1b[0m'}
+Unable to find what type of value is inside the variable.
+
+${'\x1b[36m'}Example Fix:${'\x1b[0m'}
+${'\x1b[32m'}  // Before${'\x1b[0m'}
+${'\x1b[32m'}  var ${varName} = ${varValue}; // This could be undefined${'\x1b[0m'}
+
+${'\x1b[32m'}  // After${'\x1b[0m'}
+${'\x1b[32m'}  var ${varName} = 1; // Assign it with a good type of value${'\x1b[0m'}
+`);
+                                process.exit(1);
+                            } else if (varValueType !== "integer") {
+                                console.log(`
+${'\x1b[31m'}Error: Variable Type Error${'\x1b[0m'}
+
+${'\x1b[33m'}Details:${'\x1b[0m'}
+You cannot assign a integer variable to a ${varValueType}
+
+${'\x1b[36m'}Example Fix:${'\x1b[0m'}
+${'\x1b[32m'}  // Before${'\x1b[0m'}
+${'\x1b[32m'}  int ${varName} = ${varValue}; // This could be wrong${'\x1b[0m'}
+
+${'\x1b[32m'}  // After${'\x1b[0m'}
+${'\x1b[32m'}  int ${varName} = 1; // Assign it with a good type of value${'\x1b[0m'}
+                                `);
+                                process.exit(1);
+                            }
+                            tokens.push({
+                                'Type': "variableDeclaration",
+                                'DeclType': "int",
+                                'Name': varName,
+                                'Value': varValue,
+                                'ValueType': varValueType
+                            });
+                        }
+                    }
+                    // str
+                    let strPrefix = dataNextLine[i][i2].indexOf("str");
+                    if (dataNextLine[i][i2].charAt(strPrefix) === "s" && dataNextLine[i][i2].charAt(strPrefix + 1) === "t" && dataNextLine[i][i2].charAt(strPrefix + 2) === "r") {
+                        if (dataNextLine[i][i2].charAt(strPrefix + 3) === " ") {
+                            let varValues = /str\s([a-zA-Z])\s*=\s*([a-zA-Z0-9]+|"([^"]*)")/.exec(dataNextLine[i][i2]);
+                            let varName = varValues[1].trim();
+                            let varValue = varValues[2];
+                            let varValueType;
+                            if (varValue.startsWith("'") && varValue.endsWith("'") || varValue.startsWith('"') && varValue.endsWith('"')) {
+                                varValueType = "string";
+                            } else if (/[0-9]/.test(varValue)) {
+                                varValueType = "integer";
+                            } else if (/true|false/.test(varValue)) {
+                                varValueType = "boolean";
+                            } else if (/[A-Za-z]/.test(varValue)) {
+                                varValueType = "variable";
+                            }
+                            if (varValueType === undefined) {
+                                console.log(`
+${'\x1b[31m'}Error: Variable Type Undefined${'\x1b[0m'}
+
+${'\x1b[33m'}Details:${'\x1b[0m'}
+Unable to find what type of value is inside the variable.
+
+${'\x1b[36m'}Example Fix:${'\x1b[0m'}
+${'\x1b[32m'}  // Before${'\x1b[0m'}
+${'\x1b[32m'}  var ${varName} = ${varValue}; // This could be undefined${'\x1b[0m'}
+
+${'\x1b[32m'}  // After${'\x1b[0m'}
+${'\x1b[32m'}  var ${varName} = 1; // Assign it with a good type of value${'\x1b[0m'}
+`);
+                                process.exit(1);
+                            } else if (varValueType !== "string") {
+                                console.log(`
+${'\x1b[31m'}Error: Variable Type Error${'\x1b[0m'}
+
+${'\x1b[33m'}Details:${'\x1b[0m'}
+You cannot assign a string variable to a ${varValueType}
+
+${'\x1b[36m'}Example Fix:${'\x1b[0m'}
+${'\x1b[32m'}  // Before${'\x1b[0m'}
+${'\x1b[32m'}  str ${varName} = ${varValue}; // This could be wrong${'\x1b[0m'}
+
+${'\x1b[32m'}  // After${'\x1b[0m'}
+${'\x1b[32m'}  str ${varName} = "Hello, world!"; // Assign it with a good type of value${'\x1b[0m'}
+                                `);
+                                process.exit(1);
+                            }
+                            tokens.push({
+                                'Type': "variableDeclaration",
+                                'DeclType': "str",
+                                'Name': varName,
+                                'Value': varValue,
+                                'ValueType': varValueType
+                            });
+                        }
+                    }
+                    // bool
+                    let boolPrefix = dataNextLine[i][i2].indexOf("bool");
+                    if (dataNextLine[i][i2].charAt(boolPrefix) === "b" && dataNextLine[i][i2].charAt(boolPrefix + 1) === "o" && dataNextLine[i][i2].charAt(boolPrefix + 2) === "o" && dataNextLine[i][i2].charAt(boolPrefix + 3) === "l") {
+                        if (dataNextLine[i][i2].charAt(boolPrefix + 4) === " ") {
+                            let varValues = /bool\s([a-zA-Z])\s*=\s*([a-zA-Z0-9]+|"([^"]*)"|true|false)/.exec(dataNextLine[i][i2]);
+                            let varName = varValues[1].trim();
+                            let varValue = varValues[2];
+                            let varValueType;
+                            if (varValue.startsWith("'") && varValue.endsWith("'") || varValue.startsWith('"') && varValue.endsWith('"')) {
+                                varValueType = "string";
+                            } else if (/[0-9]/.test(varValue)) {
+                                varValueType = "integer";
+                            } else if (/true|false/.test(varValue)) {
+                                varValueType = "boolean";
+                            } else if (/[A-Za-z]/.test(varValue)) {
+                                varValueType = "variable";
+                            }
+                            if (varValueType === undefined) {
+                                console.log(`
+${'\x1b[31m'}Error: Variable Type Undefined${'\x1b[0m'}
+
+${'\x1b[33m'}Details:${'\x1b[0m'}
+Unable to find what type of value is inside the variable.
+
+${'\x1b[36m'}Example Fix:${'\x1b[0m'}
+${'\x1b[32m'}  // Before${'\x1b[0m'}
+${'\x1b[32m'}  var ${varName} = ${varValue}; // This could be undefined${'\x1b[0m'}
+
+${'\x1b[32m'}  // After${'\x1b[0m'}
+${'\x1b[32m'}  var ${varName} = 1; // Assign it with a good type of value${'\x1b[0m'}
+`);
+                                process.exit(1);
+                            } else if (varValueType !== "boolean") {
+                                console.log(`
+${'\x1b[31m'}Error: Variable Type Error${'\x1b[0m'}
+
+${'\x1b[33m'}Details:${'\x1b[0m'}
+You cannot assign a boolean variable to a ${varValueType}
+
+${'\x1b[36m'}Example Fix:${'\x1b[0m'}
+${'\x1b[32m'}  // Before${'\x1b[0m'}
+${'\x1b[32m'}  bool ${varName} = ${varValue}; // This could be wrong${'\x1b[0m'}
+
+${'\x1b[32m'}  // After${'\x1b[0m'}
+${'\x1b[32m'}  bool ${varName} = true; // Assign it with a good type of value${'\x1b[0m'}
+                                `);
+                                process.exit(1);
+                            }
+                            tokens.push({
+                                'Type': "variableDeclaration",
+                                'DeclType': "bool",
+                                'Name': varName,
+                                'Value': varValue,
+                                'ValueType': varValueType
+                            });
+                        }
+                    }
+
+                    /*
                         FUNCTION EXECUTION
                     */
                     let startParen = dataNextLine[i][i2].indexOf("("); // Getting where is the starting paren
@@ -79,7 +295,7 @@
                                 if (startParen >= 0 && endParen <= element.length) {
                                     let functionName = dataNextLine[i][i2].match(/^[a-z][a-z0-9]*/)[0];
     
-                                    if (functionName !== "function") {
+                                    if (functionName !== "function" && functionName !== "var" && functionName !== "int" && functionName !== "str" && functionName !== "bool") {
                                         let functionValue = element.substring(startParen + 1, endParen);
                                         let functionType;
                                         if (functionValue.startsWith("'") && functionValue.endsWith("'") || functionValue.startsWith('"') && functionValue.endsWith('"')) {
@@ -93,25 +309,25 @@
                                         }
                                         if (functionType === undefined) {
                                             console.log(`
-            ${'\x1b[31m'}Error: Function Type Undefined${'\x1b[0m'}
-            
-            ${'\x1b[33m'}Details:${'\x1b[0m'}
-            Unable to find what type of value is inside the function.
-            
-            ${'\x1b[36m'}Example Fix:${'\x1b[0m'}
-            ${'\x1b[32m'}  // Before${'\x1b[0m'}
-            ${'\x1b[32m'}  ${functionName}(${functionValue}) // This could be undefined${'\x1b[0m'}
-            
-            ${'\x1b[32m'}  // After${'\x1b[0m'}
-            ${'\x1b[32m'}  ${functionName}(1) // Assign it with a good type of value${'\x1b[0m'}
-            ${'\x1b[32m'}
-            /* Types of valid value type
-            Boolean
-            String
-            Integer
-            Variable
-            */
-            ${'\x1b[0m'}
+${'\x1b[31m'}Error: Function Type Undefined${'\x1b[0m'}
+
+${'\x1b[33m'}Details:${'\x1b[0m'}
+Unable to find what type of value is inside the function.
+
+${'\x1b[36m'}Example Fix:${'\x1b[0m'}
+${'\x1b[32m'}  // Before${'\x1b[0m'}
+${'\x1b[32m'}  ${functionName}(${functionValue}) // This could be undefined${'\x1b[0m'}
+
+${'\x1b[32m'}  // After${'\x1b[0m'}
+${'\x1b[32m'}  ${functionName}(1) // Assign it with a good type of value${'\x1b[0m'}
+${'\x1b[32m'}
+/* Types of valid value type
+Boolean
+String
+Integer
+Variable
+*/
+${'\x1b[0m'}
                                             `);
                                             process.exit(1);
                                         }
@@ -124,42 +340,43 @@
                                     }
                                 } else {
                                     console.log(`
-        ${'\x1b[31m'}Error: Missing Parenthesis${'\x1b[0m'}
-        
-        ${'\x1b[33m'}Location: Line ${i + 1}
-        
-        ${'\x1b[31m'}A opening parenthesis '(' is missing. Please check the indicated position and ensure all parentheses are properly matched.${'\x1b[0m'}
-        
-        ${'\x1b[36m'}Example Fix:${'\x1b[0m'}
-        ${'\x1b[32m'}  // Before${'\x1b[0m'}
-        ${'\x1b[32m'}  print"Hello World");${'\x1b[0m'}
-        ${'\x1b[32m'}  // After${'\x1b[0m'}
-        ${'\x1b[32m'}  print("Hello World");${'\x1b[0m'}
+${'\x1b[31m'}Error: Missing Parenthesis${'\x1b[0m'}
+
+${'\x1b[33m'}Location: Line ${i + 1}
+
+${'\x1b[31m'}A opening parenthesis '(' is missing. Please check the indicated position and ensure all parentheses are properly matched.${'\x1b[0m'}
+
+${'\x1b[36m'}Example Fix:${'\x1b[0m'}
+${'\x1b[32m'}  // Before${'\x1b[0m'}
+${'\x1b[32m'}  print"Hello World");${'\x1b[0m'}
+${'\x1b[32m'}  // After${'\x1b[0m'}
+${'\x1b[32m'}  print("Hello World");${'\x1b[0m'}
                                         `);
                                     process.exit(1);
                                 }
                             }
                         } else {
                             console.log(`
-        ${'\x1b[31m'}Error: Missing Parenthesis${'\x1b[0m'}
-        
-        ${'\x1b[33m'}Location: Line ${i + 1}
-        
-        ${'\x1b[31m'}A closing parenthesis ')' is missing. Please check the indicated position and ensure all parentheses are properly matched.${'\x1b[0m'}
-        
-        ${'\x1b[36m'}Example Fix:${'\x1b[0m'}
-        ${'\x1b[32m'}  // Before${'\x1b[0m'}
-        ${'\x1b[32m'}  print("Hello World";${'\x1b[0m'}
-        ${'\x1b[32m'}  // After${'\x1b[0m'}
-        ${'\x1b[32m'}  print("Hello World");${'\x1b[0m'}
-                                `);
-                                process.exit(1);
-                            }
+${'\x1b[31m'}Error: Missing Parenthesis${'\x1b[0m'}
+
+${'\x1b[33m'}Location: Line ${i + 1}
+
+${'\x1b[31m'}A closing parenthesis ')' is missing. Please check the indicated position and ensure all parentheses are properly matched.${'\x1b[0m'}
+
+${'\x1b[36m'}Example Fix:${'\x1b[0m'}
+${'\x1b[32m'}  // Before${'\x1b[0m'}
+${'\x1b[32m'}  print("Hello World";${'\x1b[0m'}
+${'\x1b[32m'}  // After${'\x1b[0m'}
+${'\x1b[32m'}  print("Hello World");${'\x1b[0m'}
+                            `);
+                            process.exit(1);
                         }
                     }
-
                 }
-                return tokens;
+
+            }
+            console.log(tokens);
+            return tokens;
         } else {
             console.log("No data provided to lexer.");
         }
