@@ -8,13 +8,79 @@
     
     function lexer(data) {
         if (data) {
+
+            function splitData(data) {
+                // Replace all occurrences of \r\n with \n
+                data = data.replace(/\r\n/g, '\n');
+                
+                // Split data based on `;` not inside `{}` by using regex and manual parsing
+                const chunks = [];
+                let startIndex = 0;
+                let braceLevel = 0;
+            
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i] === '{') {
+                        braceLevel++;
+                    } else if (data[i] === '}') {
+                        braceLevel--;
+                    } else if (data[i] === ';' && braceLevel === 0) {
+                        // Split on `;` if outside of braces
+                        chunks.push(data.slice(startIndex, i).trim());
+                        startIndex = i + 1;
+                    }
+                }
+            
+                // Add the last chunk
+                chunks.push(data.slice(startIndex).trim());
+            
+                // Filter out any empty chunks
+                return chunks.filter(chunk => chunk.length > 0);
+            }
+
+            function combineFunctionBodies(data) {
+                const combined = [];
+                let currentBlock = '';
+                let insideBraces = 0;
+            
+                data.forEach(chunk => {
+                    let i = 0;
+                    while (i < chunk.length) {
+                        const char = chunk[i];
+            
+                        if (char === '{') {
+                            insideBraces++;
+                            currentBlock += char;
+                        } else if (char === '}') {
+                            insideBraces--;
+                            currentBlock += char;
+                            if (insideBraces === 0) {
+                                combined.push(currentBlock.trim());
+                                currentBlock = '';
+                            }
+                        } else if (char === ';' && insideBraces === 0) {
+                            if (currentBlock.length > 0) {
+                                currentBlock += ';';
+                                combined.push(currentBlock.trim());
+                                currentBlock = '';
+                            }
+                        } else {
+                            currentBlock += char;
+                        }
+                        i++;
+                    }
+            
+                    if (currentBlock.length > 0) {
+                        combined.push(currentBlock.trim());
+                        currentBlock = '';
+                    }
+                });
+            
+                return combined.filter(chunk => chunk.length > 0);
+            }
             
             // Making arrays for each code line & removing empty arrays of lines & spliting on } also disabling ; inside of {}
-            let dataNextLine = data.replace(/\r\n/g, '').split(/\n;/).map(chunk => {
-                const regex = /(?<=\})(?![^{}]*\{)/g;
-                return chunk.split(regex).filter(array => array.length > 0);
-            });
-    
+            let dataNextLine = [combineFunctionBodies(splitData(data))];
+            
             // Lexer
             let tokens = [];
             for (let i = 0; i < dataNextLine.length; i++) {
@@ -62,7 +128,6 @@
                                 'Body': JSON.stringify(accumulatedBody) // Push all accumulated Body objects
                             });
                         }
-
                     }
 
                     /*
@@ -159,7 +224,7 @@ ${'\x1b[32m'}  int ${varName} = 1; // Assign it with a good type of value${'\x1b
                             }
                             tokens.push({
                                 'Type': "variableDeclaration",
-                                'DeclType': "int",
+                                'DeclType': "integer",
                                 'Name': varName,
                                 'Value': varValue,
                                 'ValueType': varValueType
@@ -216,7 +281,7 @@ ${'\x1b[32m'}  str ${varName} = "Hello, world!"; // Assign it with a good type o
                             }
                             tokens.push({
                                 'Type': "variableDeclaration",
-                                'DeclType': "str",
+                                'DeclType': "string",
                                 'Name': varName,
                                 'Value': varValue,
                                 'ValueType': varValueType
@@ -273,7 +338,7 @@ ${'\x1b[32m'}  bool ${varName} = true; // Assign it with a good type of value${'
                             }
                             tokens.push({
                                 'Type': "variableDeclaration",
-                                'DeclType': "bool",
+                                'DeclType': "boolean",
                                 'Name': varName,
                                 'Value': varValue,
                                 'ValueType': varValueType
@@ -373,9 +438,7 @@ ${'\x1b[32m'}  print("Hello World");${'\x1b[0m'}
                         }
                     }
                 }
-
             }
-            console.log(tokens);
             return tokens;
         } else {
             console.log("No data provided to lexer.");
@@ -389,7 +452,7 @@ ${'\x1b[32m'}  print("Hello World");${'\x1b[0m'}
 
     // Execute a shell command to run your C program with the data file as input
     const { exec } = require('child_process');
-    exec('gcc -o ./src/interpreter/interpreter ./src/interpreter/interpreter.c ./src/interpreter/cJSON.c && .\\src\\interpreter\\interpreter ./src/lexer/tokens.json', (err, stdout, stderr) => {
+    exec('.\\src\\interpreter\\interpreter ./src/lexer/tokens.json', (err, stdout, stderr) => {
         if (err) {
             console.error('Error executing C program:', err);
             return;

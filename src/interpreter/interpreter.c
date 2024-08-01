@@ -5,13 +5,24 @@
 #include "cJSON.h"
 
 #define MAX_BUFFER_SIZE 1024
+#define MAX_VARS 100
 
 typedef struct {
     char *type;
     char *name;
     char *value;
     char *valueType;
+    char *declType;
 } TypeInfo;
+
+typedef struct {
+    char name[50];
+    char value[100];
+} Variable;
+
+// Array to store variables
+Variable variables[MAX_VARS];
+int var_count = 0;
 
 TypeInfo *process_json(const char *json_str, int *num_entries) {
     cJSON *json = cJSON_Parse(json_str);
@@ -46,25 +57,30 @@ TypeInfo *process_json(const char *json_str, int *num_entries) {
             info[index].name = NULL;
             info[index].value = NULL;
             info[index].valueType = NULL;
+            info[index].declType = NULL;
 
-            if (strcmp(type, "functionExecution") == 0) {
-                cJSON *name_value = cJSON_GetObjectItemCaseSensitive(item, "Name");
-                if (name_value != NULL && cJSON_IsString(name_value)) {
-                    const char *name = cJSON_GetStringValue(name_value);
-                    info[index].name = strdup(name); // Allocate memory for Name
-                }
+            cJSON *name_value = cJSON_GetObjectItemCaseSensitive(item, "Name");
+            if (name_value != NULL && cJSON_IsString(name_value)) {
+                const char *name = cJSON_GetStringValue(name_value);
+                info[index].name = strdup(name); // Allocate memory for Name
+            }
 
-                cJSON *value_value = cJSON_GetObjectItemCaseSensitive(item, "Value");
-                if (value_value != NULL && cJSON_IsString(value_value)) {
-                    const char *value = cJSON_GetStringValue(value_value);
-                    info[index].value = strdup(value); // Allocate memory for Value
-                }
+            cJSON *value_value = cJSON_GetObjectItemCaseSensitive(item, "Value");
+            if (value_value != NULL && cJSON_IsString(value_value)) {
+                const char *value = cJSON_GetStringValue(value_value);
+                info[index].value = strdup(value); // Allocate memory for Value
+            }
 
-                cJSON *valueType_value = cJSON_GetObjectItemCaseSensitive(item, "ValueType");
-                if (valueType_value != NULL && cJSON_IsString(valueType_value)) {
-                    const char *valueType = cJSON_GetStringValue(valueType_value);
-                    info[index].valueType = strdup(valueType); // Allocate memory for ValueType
-                }
+            cJSON *valueType_value = cJSON_GetObjectItemCaseSensitive(item, "ValueType");
+            if (valueType_value != NULL && cJSON_IsString(valueType_value)) {
+                const char *valueType = cJSON_GetStringValue(valueType_value);
+                info[index].valueType = strdup(valueType); // Allocate memory for ValueType
+            }
+
+            cJSON *declType_value = cJSON_GetObjectItemCaseSensitive(item, "DeclType");
+            if (declType_value != NULL && cJSON_IsString(declType_value)) {
+                const char *declType = cJSON_GetStringValue(declType_value);
+                info[index].declType = strdup(declType); // Allocate memory for ValueType
             }
             index++;
         }
@@ -122,8 +138,69 @@ int main(int argc, char *argv[]) {
         if (info != NULL) {
             // Print Type, Name, and Value for functionExecution
             for (int i = 0; i < num_entries; i++) {
-                if (strcmp(info[i].type, "functionExecution") == 0) {
+                if (strcmp(info[i].type, "variableDeclaration") == 0) {
+                    if (strcmp(info[i].declType, "string") == 0) {
+                        int found = 0;
+                        for (int j = 0; j < var_count; j++) {
+                            if (strcmp(variables[j].name, info[i].name) == 0) {
+                                // Update existing variable
+                                strncpy(variables[j].value, info[i].value, sizeof(variables[j].value) - 1);
+                                variables[j].value[sizeof(variables[j].value) - 1] = '\0'; // Ensure null termination
+                                found = 1;
+                                break;
+                            }
+                        }
+                        if (!found && var_count < MAX_VARS) {
+                            // Add new variable
+                            strncpy(variables[var_count].name, info[i].name, sizeof(variables[var_count].name) - 1);
+                            variables[var_count].name[sizeof(variables[var_count].name) - 1] = '\0'; // Ensure null termination
+                            strncpy(variables[var_count].value, slice(info[i].value), sizeof(variables[var_count].value) - 1);
+                            variables[var_count].value[sizeof(variables[var_count].value) - 1] = '\0'; // Ensure null termination
+                            var_count++;
+                        }
+                    } else if (strcmp(info[i].declType, "boolean") == 0) {
+                        int found = 0;
+                        for (int j = 0; j < var_count; j++) {
+                            if (strcmp(variables[j].name, info[i].name) == 0) {
+                                // Update existing variable
+                                strncpy(variables[j].value, info[i].value, sizeof(variables[j].value) - 1);
+                                variables[j].value[sizeof(variables[j].value) - 1] = '\0'; // Ensure null termination
+                                found = 1;
+                                break;
+                            }
+                        }
+                        if (!found && var_count < MAX_VARS) {
+                            // Add new variable
+                            strncpy(variables[var_count].name, info[i].name, sizeof(variables[var_count].name) - 1);
+                            variables[var_count].name[sizeof(variables[var_count].name) - 1] = '\0'; // Ensure null termination
+                            strncpy(variables[var_count].value, info[i].value, sizeof(variables[var_count].value) - 1);
+                            variables[var_count].value[sizeof(variables[var_count].value) - 1] = '\0'; // Ensure null termination
+                            var_count++;
+                        }
+                    } else if (strcmp(info[i].declType, "integer") == 0) {
+                        int found = 0;
+                        for (int j = 0; j < var_count; j++) {
+                            if (strcmp(variables[j].name, info[i].name) == 0) {
+                                // Update existing variable
+                                strncpy(variables[j].value, info[i].value, sizeof(variables[j].value) - 1);
+                                variables[j].value[sizeof(variables[j].value) - 1] = '\0'; // Ensure null termination
+                                found = 1;
+                                break;
+                            }
+                        }
+                        if (!found && var_count < MAX_VARS) {
+                            // Add new variable
+                            strncpy(variables[var_count].name, info[i].name, sizeof(variables[var_count].name) - 1);
+                            variables[var_count].name[sizeof(variables[var_count].name) - 1] = '\0'; // Ensure null termination
+                            strncpy(variables[var_count].value, info[i].value, sizeof(variables[var_count].value) - 1);
+                            variables[var_count].value[sizeof(variables[var_count].value) - 1] = '\0'; // Ensure null termination
+                            var_count++;
+                        }
+                    } else if (strcmp(info[i].declType, "variable") == 0) {
+                    }
+                } else if (strcmp(info[i].type, "functionExecution") == 0) {
                     if (strcmp(info[i].name, "print") == 0) {
+                        const char* valueToPrint;
                         if (strcmp(info[i].valueType, "string") == 0) {
                             printf(info[i].value != NULL ? slice(info[i].value) : "N/A");
                         } else if (strcmp(info[i].valueType, "boolean") == 0) {
@@ -131,8 +208,21 @@ int main(int argc, char *argv[]) {
                         } else if (strcmp(info[i].valueType, "integer") == 0) {
                             printf("%d", atoi(info[i].value));
                         } else if (strcmp(info[i].valueType, "variable") == 0) {
-                            // Print a variable value
+                            // Retrieve the variable value
+                            valueToPrint = NULL;
+                            for (int j = 0; j < var_count; j++) {
+                                if (strcmp(variables[j].name, info[i].value) == 0) {
+                                    valueToPrint = variables[j].value;
+                                    break;
+                                }
+                            }
+                            if (valueToPrint == NULL) {
+                                valueToPrint = "undefined";
+                            }
+                        } else {
+                            valueToPrint = "unknown type";
                         }
+                        printf("%s\n", valueToPrint);
                     }
                 }
                 free(info[i].type); // Free allocated memory for Type
