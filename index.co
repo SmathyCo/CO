@@ -2,6 +2,5 @@ function test(arg1, arg2) {
     print("Hello, world!2");
     print(1);
 }
-int y = 1;
-int x = y;
+var x = "test";
 print(x);

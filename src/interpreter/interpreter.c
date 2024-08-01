@@ -196,6 +196,32 @@ int main(int argc, char *argv[]) {
                             variables[var_count].value[sizeof(variables[var_count].value) - 1] = '\0'; // Ensure null termination
                             var_count++;
                         }
+                    } else if (strcmp(info[i].declType, "var") == 0) {
+                        int found = 0;
+                        for (int j = 0; j < var_count; j++) {
+                            if (strcmp(variables[j].name, info[i].name) == 0) {
+                                // Update existing variable
+                                strncpy(variables[j].value, info[i].value, sizeof(variables[j].value) - 1);
+                                variables[j].value[sizeof(variables[j].value) - 1] = '\0'; // Ensure null termination
+                                found = 1;
+                                break;
+                            }
+                        }
+                        if (!found && var_count < MAX_VARS) {
+                            // Add new variable
+                            strncpy(variables[var_count].name, info[i].name, sizeof(variables[var_count].name) - 1);
+                            variables[var_count].name[sizeof(variables[var_count].name) - 1] = '\0'; // Ensure null termination
+                            if (strcmp(info[i].valueType, "string") == 0) {
+                                strncpy(variables[var_count].value, slice(info[i].value), sizeof(variables[var_count].value) - 1);
+                            } else if (strcmp(info[i].valueType, "boolean") == 0) {
+                                strncpy(variables[var_count].value, info[i].value, sizeof(variables[var_count].value) - 1);
+                            } else if (strcmp(info[i].valueType, "integer") == 0) {
+                                strncpy(variables[var_count].value, info[i].value, sizeof(variables[var_count].value) - 1);
+                            } else if (strcmp(info[i].valueType, "variable") == 0) {
+                            }
+                            variables[var_count].value[sizeof(variables[var_count].value) - 1] = '\0'; // Ensure null termination
+                            var_count++;
+                        }
                     } else if (strcmp(info[i].declType, "variable") == 0) {
                     }
                 } else if (strcmp(info[i].type, "functionExecution") == 0) {
