@@ -26,3 +26,5 @@ We chose Node.js for our backend due to its seamless integration with the C prog
 4. It should open a command prompt window and you just need to wait for it to install the dependencies.
 5. Close the command prompts you are using and reopen the ones that you will use for the project.
 6. Now you can use `co ./index.co` to run a co file!
+
+Made by SmathyCo.
