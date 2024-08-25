@@ -5,7 +5,7 @@ if (process.argv[2]) {
     try {
         execSync(`git commit -m "${process.argv[2]}"`);
     } catch(err) {
-        console.error("Error committing changes:", err);
+        console.error("Can't commit, nothing changed in the project.");
         process.exit(1);
     }
     execSync("git push -u origin main --force");
