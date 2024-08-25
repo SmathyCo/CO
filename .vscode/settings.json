@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "lexer.h": "c",
+        "typeinfo": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled",
+    "cSpell.words": [
+        "cout",
+        "endl",
+        "iostream"
+    ]
+}
